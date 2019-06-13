@@ -463,6 +463,11 @@ class TextStringObject(utils.string_type, PdfObject):
                     stream.write(b_(chr_(c)))
             stream.write(b_(")"))
 
+def _decode(bb):
+    try:
+        return bb.decode('utf-8')
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        return bb.decode('gbk')
 
 class NameObject(str, PdfObject):
     delimiterPattern = re.compile(b_(r"\s+|[\(\)<>\[\]{}/%]"))
@@ -481,7 +486,7 @@ class NameObject(str, PdfObject):
             ignore_eof=True)
         if debug: print(name)
         try:
-            return NameObject(name.decode('utf-8'))
+            return NameObject(_decode(name))
         except (UnicodeEncodeError, UnicodeDecodeError) as e:
             # Name objects should represent irregular characters
             # with a '#' followed by the symbol's hex number
