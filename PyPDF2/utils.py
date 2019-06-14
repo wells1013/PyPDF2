@@ -235,7 +235,7 @@ else:
         if type(s) == bytes:
             return s
         else:
-            r = s.encode('latin-1')
+            r = decode_str(value=s, available_codes=['latin-1', 'utf-8'])
             if len(s) < 2:
                 bc[s] = r
             return r
@@ -257,6 +257,14 @@ def str_(b):
         else:
             return b
 
+
+def decode_str(value: (bytes, str), available_codes: list) -> str:
+    code = available_codes.pop(0)
+    try:
+        return value.decode(code)
+    except (UnicodeEncodeError, UnicodeDecodeError) as e:
+        if len(available_codes) > 0: return decode_str(value, available_codes=available_codes)
+        else:raise e
 
 def ord_(b):
     if sys.version_info[0] < 3 or type(b) == str:
