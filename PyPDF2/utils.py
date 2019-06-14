@@ -235,7 +235,7 @@ else:
         if type(s) == bytes:
             return s
         else:
-            r = decode_str(value=s, available_codes=['latin-1', 'utf-8'])
+            r = encode_str(value=s, available_codes=['latin-1', 'utf-8'])
             if len(s) < 2:
                 bc[s] = r
             return r
@@ -257,13 +257,20 @@ def str_(b):
         else:
             return b
 
+def encode_str(value: str, available_codes: list) -> bytes:
+    code = available_codes.pop(0)
+    try:
+        return value.encode(code)
+    except (UnicodeEncodeError, UnicodeDecodeError) as e:
+        if len(available_codes) > 0: return encode_str(value, available_codes=available_codes)
+        else:raise e
 
-def decode_str(value: (bytes, str), available_codes: list) -> str:
+def decode_bytes(value: bytes, available_codes: list) -> str:
     code = available_codes.pop(0)
     try:
         return value.decode(code)
     except (UnicodeEncodeError, UnicodeDecodeError) as e:
-        if len(available_codes) > 0: return decode_str(value, available_codes=available_codes)
+        if len(available_codes) > 0: return decode_bytes(value, available_codes=available_codes)
         else:raise e
 
 def ord_(b):
