@@ -535,7 +535,9 @@ class PdfFileWriter(object):
         """
         args = {}
         for key, value in list(infos.items()):
-            args[NameObject(key)] = createStringObject(value)
+            # maybe BooleanObject, ArrayObject etc..
+            if isinstance(value, PdfObject): args[NameObject(key)] = value
+            else: args[NameObject(key)] = createStringObject(value)
         self.getObject(self._info).update(args)
 
     def _sweepIndirectReferences(self, externMap, data):
